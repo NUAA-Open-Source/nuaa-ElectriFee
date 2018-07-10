@@ -1,0 +1,17 @@
+POST http://222.192.89.21/sims3/default.aspx HTTP/1.1
+Host: 222.192.89.21
+Connection: keep-alive
+Content-Length: 356
+Pragma: no-cache
+Cache-Control: no-cache
+Origin: http://222.192.89.21
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Referer: http://222.192.89.21/sims3/default.aspx
+Accept-Encoding: gzip, deflate
+Accept-Language: en,zh-CN;q=0.9,zh;q=0.8,zh-TW;q=0.7,en-US;q=0.6
+Cookie: ASP.NET_SessionId=pxa0iwgy15eojtgncmvc5kxq
+
+__EVENTTARGET=drlouming&__EVENTARGUMENT=&__LASTFOCUS=&__VIEWSTATE=%2FwEPDwUJMzc4OTU2MDY0D2QWAgIBD2QWCAIBDxBkZBYBZmQCAw8QZGQWAWZkAgUPEGRkFgFmZAIHDxBkZBYBZmQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgQFBGJ1eVIFBXVzZWRSBQxJbWFnZUJ1dHRvbjEFDEltYWdlQnV0dG9uMj1GOmHq3Mw3qFCPBtuMHiBq84vS6BbHByMJCCsaDXpu&drlouming=1&DropDownList1=&drceng=&dr_ceng=&drfangjian=
