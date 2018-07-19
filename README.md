@@ -13,3 +13,7 @@
 `inspect/inspect.txt`是本人暂时整理的对应关系。
 
 `src/command.sh`是整理的有效命令。
+
+
+
+电费查询网址（需校园内网）`http://222.192.89.21/sims3/default.aspx`
