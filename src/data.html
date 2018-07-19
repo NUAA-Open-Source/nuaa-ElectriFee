@@ -1,0 +1,65 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>购电记录</title>
+<link rel="stylesheet" type="text/css" href="css/page.css"/>
+<link rel="stylesheet" type="text/css" href="css/theme1.css"/>
+<script src="js/webcalendar.js" type="text/javascript"></script>
+</head>
+
+<body>
+<form name="form1" method="post" action="buyRecord.aspx" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKMTcxNzcyMzU5MWRkwsYLjVzTUUtvP8Zc/o59I1dV/KFOR6rQ2t4WKxAuRD0=" />
+
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEWBALe5NPqDQLE2qDzBgKG+5Y+AouTwe8CDNA8fyw0ZpUpP6Ov3YtPWg+o80APCfSMPil96OoI1+0=" />
+<div class="wrap">
+  <div class="banner"><img src="images/banner.jpg" alt="" />
+  </div>
+  <div class="main">
+    <div class="crumb">
+      <h2>欢迎登录购电查询系统</h2>
+      <hr  class="line"/>
+      <h6>房间 21-1003空调01 剩余金额：<span class="number orange">17.01</span> 元</h6>
+      <div class="status">
+      	日期：2018年07月19日  星期四  <a href="Default.aspx">退出</a>
+      </div>
+    </div>
+    <div class="searchFrm">
+    	<ul>
+        	<li>日期：</li>
+            <li><input name="txtstart" type="text" id="txtstart" class="inp" onclick="SelectDate(this,&#39;yyyy-MM-dd&#39;)" /></li>
+            <li>至</li>
+            <li><input name="txtend" type="text" id="txtend" class="inp" onclick="SelectDate(this,&#39;yyyy-MM-dd&#39;)" /></li>
+            <li>
+                <input type="submit" name="btnser" value="查询" id="btnser" class="inb" /></li>
+        </ul>
+    </div>
+    <div class="searchRes">
+    	<table cellpadding="0" cellspacing="0" border="0" width="100%" class="dataTable">
+        	<tr class="titleLine">
+
+            <td>日期</td>
+        	    <td>充值电量(度)</td>
+            	<td>充值金额(元)</td>
+                <td>充值人</td>
+                
+            </tr>
+            
+
+        </table>
+        <div class="pageer">
+        	第 1 页 / 共 0 页  每页 10 条
+            <div class="pageControl">
+                
+            	<a href="buyRecord.aspx">首页</a> |  | <a href="buyRecord.aspx?p=0">尾页</a>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+</form>
+</body>
+</html>
