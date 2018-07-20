@@ -1,5 +1,6 @@
 import requests
 import re
+import sys
 
 
 def getViewstate(text):
@@ -8,21 +9,45 @@ def getViewstate(text):
         r'.*id\=\"\_\_VIEWSTATE\" value\=\"(.*)\" \/\>\r\n\r\n\<div class\=\"acountWrap\"\>', text, re.S)
     return data.group(1)
 
+
 def getFee(text):
     # 匹配剩余电费
     data = re.match(
-        r'.*\<span class\=\"number orange\"\>(\d\d\.\d\d)\<\/span\>', text, re.S)
+        r'.*\<span class\=\"number orange\"\>(\-*\d+\.\d\d)\<\/span\>', text, re.S)
+        # 居然会有负数，坑死我了
     return data.group(1)
 
+def getFloor(text):
+    # 此函数用于返回与楼层对应的dr_ceng的值
+    mat=re.match(r'\d\d(\d\d)\d\d\d\d',text)
+    floor=mat.group(1)
+    id=int(floor)+213
+    return str(id)
+
+def getRoom(text):
+    # 此函数用于返回与楼层对应的drfangjian的值
+    mat=re.match(r'\d\d(\d\d)(\d\d)(\d\d)',text)
+    floor=mat.group(1)
+    big_room=mat.group(2)
+    small_room=mat.group(3)
+    if int(big_room)<=2 :
+        id=(int(floor)-1)*28+(int(big_room)-1)*4+int(small_room)-1+2647
+    else:
+        id=(int(floor)-1)*28+(int(big_room)-3)*5+int(small_room)-1+2647+8
+    return str(id)
 
 url_1 = 'http://222.192.89.21/sims3/default.aspx'
-url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx'
+url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx' # emmm这个好像没什么卵用
 cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybevvfjj'}  # 可自行替换
 data = {'__EVENTTARGET': '', '__EVENTARGUMENT': '', '__LASTFOCUS': '', '__VIEWSTATE': '', 'drlouming': '', 'DropDownList1': '',
         'drceng': '', 'dr_ceng': '', 'drfangjian': '', 'radio': 'buyR', 'ImageButton1.x': '45', 'ImageButton1.y': '4'}  # 需要POST的数据
 
+
+
+
+
 # 下面模拟各次请求，以将军路校区怡园21栋空调用电为例。
-# 暂时吧数据写死，先测试几下
+# 暂时把数据写死，先测试几下
 
 # 第一次请求
 response = requests.post(url_1, cookies=cookies)
@@ -45,12 +70,12 @@ data['__VIEWSTATE'] = getViewstate(response.text)
 
 # 以下以60305模拟
 # 第五次请求
-data['dr_ceng'] = '219'
+data['dr_ceng'] = getFloor(sys.argv[1])
 response = requests.post(url_1, cookies=cookies, data=data)
 data['__VIEWSTATE'] = getViewstate(response.text)
 
 # 第六次请求
-data['drfangjian'] = '2799'
+data['drfangjian'] = getRoom(sys.argv[1])
 response = requests.post(url_1, cookies=cookies, data=data)
 # print(response.text)
 # print(data)
