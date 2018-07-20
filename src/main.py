@@ -47,7 +47,6 @@ data = {'__EVENTTARGET': '', '__EVENTARGUMENT': '', '__LASTFOCUS': '', '__VIEWST
 
 
 # 下面模拟各次请求，以将军路校区怡园21栋空调用电为例。
-# 暂时把数据写死，先测试几下
 
 # 第一次请求
 response = requests.post(url_1, cookies=cookies)
@@ -68,7 +67,6 @@ data['drceng'] = '71'
 response = requests.post(url_1, cookies=cookies, data=data)
 data['__VIEWSTATE'] = getViewstate(response.text)
 
-# 以下以60305模拟
 # 第五次请求
 data['dr_ceng'] = getFloor(sys.argv[1])
 response = requests.post(url_1, cookies=cookies, data=data)
