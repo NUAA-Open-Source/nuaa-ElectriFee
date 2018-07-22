@@ -49,7 +49,7 @@ for i in range(0,5):
 
 url_1 = 'http://222.192.89.21/sims3/default.aspx'
 url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx'  # emmm这个好像没什么卵用
-cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybe'+randStr}  # 可自行替换
+cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybe'+randStr}  # 随机cookie，防止多人同时访问引起异常
 data = {'__EVENTTARGET': '', '__EVENTARGUMENT': '', '__LASTFOCUS': '', '__VIEWSTATE': '', 'drlouming': '', 'DropDownList1': '',
         'drceng': '', 'dr_ceng': '', 'drfangjian': '', 'radio': 'buyR', 'ImageButton1.x': '45', 'ImageButton1.y': '4'}  # 需要POST的数据
 proxies = {'http': 'http://frp.vvzero.com:21402/'}  # 自己设的校内代理
