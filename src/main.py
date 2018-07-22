@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import re
 import sys
@@ -41,7 +43,7 @@ url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx' # emmm这个好像没什么�
 cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybevvfjj'}  # 可自行替换
 data = {'__EVENTTARGET': '', '__EVENTARGUMENT': '', '__LASTFOCUS': '', '__VIEWSTATE': '', 'drlouming': '', 'DropDownList1': '',
         'drceng': '', 'dr_ceng': '', 'drfangjian': '', 'radio': 'buyR', 'ImageButton1.x': '45', 'ImageButton1.y': '4'}  # 需要POST的数据
-proxies = {'http': 'http://frp.vvzero.com:21402/'}
+proxies = {'http': 'http://frp.vvzero.com:21402/'} # 自己设的校内代理
 
 
 
