@@ -6,15 +6,22 @@
 
 本人优先开发怡园21栋空调用电。
 
+目前部署的微信公众号：裂帛碎玉的想法
+
+![](https://source.vvzero.com/wechat-qcode.jpg)
+
 
 
 ## 说明
 
-该项目刚刚起步，目前主要的问题是，电费类目与参数的对应太过复杂。
+该项目已经初步完成，`src/`中的代码可直接使用。
 
 `src/main.py`是获取电费的python脚本。
+
 `src/index.php`是与微信交互的页面。
+
 `src/wechat.class.php`是瑞辅大佬给的微信库。
+
 `inspect/inspect.txt`是本人暂时整理的对应关系。
 
 
