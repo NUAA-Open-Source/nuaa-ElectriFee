@@ -6,7 +6,7 @@ import sys
 import random
 
 
-character='qwertyuiopasdfghjklzxcvbnm0123456789' # 用于生成随机字符串
+character='qwertyuiopasdfghjklzxcvbnm' # 用于生成随机字符串
 
 def getViewstate(text):
     # 这里使用这样的正则表达式匹配__VIEWSTATE字段，使用Python requests应该这样匹配，其他浏览器可能不一样
@@ -45,7 +45,7 @@ def getRoom(text):
 
 randStr = ""
 for i in range(0,5):
-    randStr += character[random.randint(0,35)] # 生成随机cookie
+    randStr += character[random.randint(0,25)] # 生成随机cookie
 
 url_1 = 'http://222.192.89.21/sims3/default.aspx'
 url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx'  # emmm这个好像没什么卵用
