@@ -18,10 +18,6 @@
 
 `src/main.py`是获取电费的python脚本。
 
-`src/index.php`是与微信交互的页面。
-
-`src/wechat.class.php`是瑞辅大佬给的微信库。
-
 `inspect/inspect.txt`是本人暂时整理的对应关系。
 
 
