@@ -6,8 +6,6 @@ import sys
 import random
 
 
-character='qwertyuiopasdfghjklzxcvbnm' # 用于生成随机字符串
-
 def getViewstate(text):
     # 这里使用这样的正则表达式匹配__VIEWSTATE字段，使用Python requests应该这样匹配，其他浏览器可能不一样
     data = re.match(
@@ -23,33 +21,49 @@ def getFee(text):
     return data.group(1)
 
 
+def getBuilding(text):
+    # 此函数用于返回与楼栋对应的drceng的值
+    mat = re.match(r'(\d\d)\d\d\d\d\d\d', text)
+    building = int(mat.group(1))
+    id = building+50
+    return str(id)
+
+
 def getFloor(text):
     # 此函数用于返回与楼层对应的dr_ceng的值
-    mat = re.match(r'\d\d(\d\d)\d\d\d\d', text)
-    floor = mat.group(1)
-    id = int(floor)+213
+    mat = re.match(r'(\d\d)(\d\d)\d\d\d\d', text)
+    building = int(mat.group(1))
+    floor = int(mat.group(2))
+    id = floor+(building-21)*19+213
     return str(id)
+
+
+orgRoom = {21: 2647, 22: 3161}  # 每栋楼第一个房间的drfangjian值
 
 
 def getRoom(text):
-    # 此函数用于返回与楼层对应的drfangjian的值
-    mat = re.match(r'\d\d(\d\d)(\d\d)(\d\d)', text)
-    floor = mat.group(1)
-    big_room = mat.group(2)
-    small_room = mat.group(3)
-    if int(big_room) <= 2:
-        id = (int(floor)-1)*28+(int(big_room)-1)*4+int(small_room)-1+2647
+    # 此函数用于返回与房间对应的drfangjian的值
+    mat = re.match(r'(\d\d)(\d\d)(\d\d)(\d\d)', text)
+    building = int(mat.group(1))
+    floor = int(mat.group(2))
+    big_room = int(mat.group(3))
+    small_room = int(mat.group(4))
+    if big_room <= 2:
+        id = (floor-1)*28+(big_room-1)*4+small_room-1+orgRoom[building]
     else:
-        id = (int(floor)-1)*28+(int(big_room)-3)*5+int(small_room)-1+2647+8
+        id = (floor-1)*28+(big_room-3)*5+small_room-1+8+orgRoom[building]
     return str(id)
 
+
+character = 'qwertyuiopasdfghjklzxcvbnm'  # 用于生成随机字符串
 randStr = ""
-for i in range(0,5):
-    randStr += character[random.randint(0,25)] # 生成随机cookie
+for i in range(0, 5):
+    randStr += character[random.randint(0, 25)]  # 生成随机cookie
 
 url_1 = 'http://222.192.89.21/sims3/default.aspx'
 url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx'  # emmm这个好像没什么卵用
-cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybe'+randStr}  # 随机cookie，防止多人同时访问引起异常
+# 随机cookie，防止多人同时访问引起异常
+cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybe'+randStr}
 data = {'__EVENTTARGET': '', '__EVENTARGUMENT': '', '__LASTFOCUS': '', '__VIEWSTATE': '', 'drlouming': '', 'DropDownList1': '',
         'drceng': '', 'dr_ceng': '', 'drfangjian': '', 'radio': 'buyR', 'ImageButton1.x': '45', 'ImageButton1.y': '4'}  # 需要POST的数据
 proxies = {'http': 'http://0.0.0.0:0'}  # 填写校内代理
@@ -72,7 +86,7 @@ response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
 data['__VIEWSTATE'] = getViewstate(response.text)
 
 # 第四次请求
-data['drceng'] = '71'
+data['drceng'] = getBuilding(sys.argv[1])
 response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
 data['__VIEWSTATE'] = getViewstate(response.text)
 
