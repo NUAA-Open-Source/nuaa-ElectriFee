@@ -32,6 +32,38 @@ def getRoom(number, text):
 
     return data.group(1)
 
+# 模拟请求的过程
+def SimuRequest(url, cookies, proxies, data):
+    # 第一次请求
+    response = requests.post(url_1, cookies=cookies, proxies=proxies,timeout=2)
+    data['__VIEWSTATE'] = getViewstate(response.text)
+
+    # 第二次请求
+    data['drlouming'] = '1'
+    response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies,timeout=2)
+    data['__VIEWSTATE'] = getViewstate(response.text)
+
+    # 第三次请求
+    data['DropDownList1'] = '7'
+    response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies,timeout=2)
+    data['__VIEWSTATE'] = getViewstate(response.text)
+
+    # 第四次请求，drceng是 "02"+楼栋号
+    data['drceng'] = "02"+sys.argv[1][0:2]
+    response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies,timeout=2)
+    data['__VIEWSTATE'] = getViewstate(response.text)
+
+    # 第五次请求
+    data['dr_ceng'] = data['drceng']+sys.argv[1][2:4]
+    response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies,timeout=2)
+    data['__VIEWSTATE'] = getViewstate(response.text)
+
+    # 第六次请求
+    data['drfangjian'] = getRoom(sys.argv[1], response.text)
+    response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies,timeout=2)
+    # print(response.text)
+    # print(data)
+    return getFee(response.text)
 
 character = 'qwertyuiopasdfghjklzxcvbnm'  # 用于生成随机字符串
 randStr = ""
@@ -44,40 +76,15 @@ url_2 = 'http://222.192.89.21/sims3/buyRecord.aspx'  # emmm这个好像没什么
 cookies = {'ASP.NET_SessionId': 'idd1fueg2bcpwokoybe'+randStr}
 data = {'__EVENTTARGET': '', '__EVENTARGUMENT': '', '__LASTFOCUS': '', '__VIEWSTATE': '', 'drlouming': '', 'DropDownList1': '',
         'drceng': '', 'dr_ceng': '', 'drfangjian': '', 'radio': 'buyR', 'ImageButton1.x': '45', 'ImageButton1.y': '4'}  # 需要POST的数据
-proxies = {'http': 'http://localhost:8848'}  # 填写校内代理
+proxies_1 = {'http': 'http://0.0.0.0:0'}  # 填写校内代理
+proxies_2 = {'http': 'http://0.0.0.0:1'}  # 填写校内代理
 
 
-# 下面模拟各次请求，以将军路校区怡园21栋空调用电为例。
-
-# 第一次请求
-response = requests.post(url_1, cookies=cookies, proxies=proxies)
-data['__VIEWSTATE'] = getViewstate(response.text)
-
-# 第二次请求
-data['drlouming'] = '1'
-response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
-data['__VIEWSTATE'] = getViewstate(response.text)
-
-# 第三次请求
-data['DropDownList1'] = '7'
-response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
-data['__VIEWSTATE'] = getViewstate(response.text)
-
-# 第四次请求，drceng是 "02"+楼栋号
-data['drceng'] = "02"+sys.argv[1][0:2]
-response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
-data['__VIEWSTATE'] = getViewstate(response.text)
-
-# 第五次请求
-data['dr_ceng'] = data['drceng']+sys.argv[1][2:4]
-response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
-data['__VIEWSTATE'] = getViewstate(response.text)
-
-# 第六次请求
-data['drfangjian'] = getRoom(sys.argv[1], response.text)
-response = requests.post(url_1, cookies=cookies, data=data, proxies=proxies)
-# print(response.text)
-# print(data)
-
-# 打印电费
-print(getFee(response.text))
+# 下面模拟各次请求，并当一个代理不可用时，尝试备用代理。
+try:
+    print(SimuRequest(url_1, cookies, proxies_1, data))
+except:
+    try:
+        print(SimuRequest(url_1, cookies, proxies_2, data))
+    except:
+        print("Error!")
