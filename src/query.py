@@ -4,7 +4,7 @@ import re
 import sys
 import random
 from bs4 import BeautifulSoup
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import pickle
 import json
