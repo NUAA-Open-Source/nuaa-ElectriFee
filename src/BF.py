@@ -202,6 +202,10 @@ def RoomRequest(text, res, url, sess, proxies, data, extra):
         CampusNo = NewData['drlouming']
         RoomMergedId = re.findall('\d+', option[0].strip())
         RoomMergedId.insert(0, CampusNo)
+        # Special Situation Start
+        if NewData['drlouming'] == '1' and NewData['DropDownList1'] == '2' and NewData['drceng'] == '51':
+            del RoomMergedId[-1]
+        # Special Situation End
         mergeData(RoomMergedId, (extra + '-' + option[0].strip(), NewData))
         print('[*] ' + NewText + ' -> ' + str(NewData) + '\n')
         # ProcessResult(NewText, response.text, NewData)

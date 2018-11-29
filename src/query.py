@@ -9,6 +9,8 @@ from requests.adapters import HTTPAdapter
 import pickle
 import json
 import yaml
+from flask import Flask, request
+
 
 class Utils(object):
 	@staticmethod
@@ -123,14 +125,14 @@ class QueryFee(object):
 
 	def ExecuteQuery(self, campus: int, building: int, public_dorm: int, private_dorm: int = None):
 		query_item_extra = None
+		result = ''
 		try:
 			query_item = self.room_mapping[campus][building][public_dorm]
 			if private_dorm is not None:
 				query_item_extra = self.room_mapping[campus][building][public_dorm][private_dorm]
 		except:
-			print('[!] Record not found in database! Does this dorm exist?')
+			return 'Dorm not found', 404
 			sys.exit(1)
-
 		for key, item in query_item.items():
 			if isinstance(key, int) or key.isdigit(): # Priv Dorm
 				continue
@@ -138,16 +140,15 @@ class QueryFee(object):
 				res = self._ExecuteRequest(item)
 			except requests.exceptions.ProxyError as e:
 				print('[!] Proxy failed.')
-				sys.exit(1)
+				return 'Proxy failed.', 500
 			except requests.exceptions.Timeout as e:
 				print('[!] Timeout occurs. Remote server may not be responding.')
-				sys.exit(1)
+				return 'Timeout occurs. Remote server may not be responding.', 500
 			except requests.exceptions.RequestException as e:
 				print('[!] Internal Server Error.')
-				sys.exit(1)
+				return 'Internal Server Error.', 500
 			# print(key + ':' + res)
-			print(res)
-
+			result = result + res + '\n'
 		if query_item_extra is not None:
 			for key, item in query_item_extra.items():
 				if isinstance(key, int) or key.isdigit():
@@ -156,21 +157,41 @@ class QueryFee(object):
 					res = self._ExecuteRequest(item)
 				except requests.exceptions.ProxyError as e:
 					print('[!] Proxy failed.')
-					sys.exit(1)
+					return 'Proxy failed.', 500
 				except requests.exceptions.Timeout as e:
 					print('[!] Timeout occurs. Remote server may not be responding.')
-					sys.exit(1)
+					return 'Timeout occurs. Remote server may not be responding.', 500
 				except requests.exceptions.RequestException as e:
 					print('[!] Internal Server Error.')
-					sys.exit(1)
+					return 'Internal Server Error.', 500
 				# print(key + ':' + res)
-				print(res)
+				result = result + res + '\n'
+		return result, 200
 
+app = Flask(__name__)
+@app.route('/query', methods=['POST'])
+def request_handler():
+	try:
+		campus = int(request.form['campus'])
+		building = int(request.form['building'])
+		public_dorm = int(request.form['public_dorm'])
+		if 'private_dorm' in request.form:
+			private_dorm = int(request.form['private_dorm'])
+		else:
+			private_dorm = None
+	except Exception as e:
+		return 'Invalid Arguments', 401
+	q = QueryFee(sys.argv[1])
+	return q.ExecuteQuery(campus, building, public_dorm, private_dorm)
 
 if __name__ == "__main__":
+	app.run(port=5000)
+	
+	'''
 	q = QueryFee(sys.argv[1])
 	arg_copy = sys.argv.copy()
 	arg_copy.pop(1)
 	arg_copy.pop(0)
 	arg_copy = [int(x) for x in arg_copy]
 	q.ExecuteQuery(*arg_copy)
+	'''
