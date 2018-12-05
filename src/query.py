@@ -4,12 +4,14 @@ import re
 import sys
 import random
 from bs4 import BeautifulSoup
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import pickle
 import json
 import yaml
+import datetime
 from flask import Flask, request
+import logging
 
 
 class Utils(object):
@@ -17,6 +19,11 @@ class Utils(object):
 	def getViewstate(text):
 		bs = BeautifulSoup(text, "html.parser")
 		return bs.find("input", {"id": "__VIEWSTATE"}).attrs['value']
+
+	@staticmethod
+	def getEventValidation(text):
+		bs = BeautifulSoup(text, "html.parser")
+		return bs.find("input", {"id": "__EVENTVALIDATION"}).attrs['value']
 
 	@staticmethod
 	def requests_retry_session(
@@ -48,6 +55,17 @@ class Utils(object):
 		bs = BeautifulSoup(text, "html.parser")
 		return bs.find("h6").text
 
+	@staticmethod
+	def getPurchaseHistory(text):
+		data = []
+		bs = BeautifulSoup(text, "html.parser")
+		rows = bs.find_all('tr', attrs={'class':'contentLine'})
+		for row in rows:
+			cols = row.find_all('td')
+			cols = [ele.text.strip() for ele in cols]
+			data.append([ele for ele in cols if ele])
+		return data
+
 class QueryFee(object):
 
 	uri = 'http://222.192.89.21/sims3/default.aspx'
@@ -55,9 +73,6 @@ class QueryFee(object):
 	room_mapping = {}
 
 	def __init__(self, filepath: str):
-		if not isinstance(filepath, str):
-			print('[!] No data specified!')
-			sys.exit()
 		'''
 		with open(filepath, 'r') as stream:
 			try:
@@ -70,9 +85,10 @@ class QueryFee(object):
 				self.room_mapping = pickle.load(f)
 			except:
 				print('[!] Error when reading file.')
+				sys.exit()
 
 	def _ProcessResult(self, res, data):
-		return Utils.getDescriptiveText(res)
+		return {'balance': Utils.getDescriptiveText(res)}
 
 	def _RoomRequest(self, sess, query_data, target_data):
 		new_data = dict(query_data)
@@ -125,7 +141,7 @@ class QueryFee(object):
 
 	def ExecuteQuery(self, campus: int, building: int, public_dorm: int, private_dorm: int = None):
 		query_item_extra = None
-		result = ''
+		result = []
 		try:
 			query_item = self.room_mapping[campus][building][public_dorm]
 			if private_dorm is not None:
@@ -148,7 +164,8 @@ class QueryFee(object):
 				print('[!] Internal Server Error.')
 				return 'Internal Server Error.', 500
 			# print(key + ':' + res)
-			result = result + res + '\n'
+			# result = result + res + '\n'
+			result.append(res)
 		if query_item_extra is not None:
 			for key, item in query_item_extra.items():
 				if isinstance(key, int) or key.isdigit():
@@ -165,8 +182,44 @@ class QueryFee(object):
 					print('[!] Internal Server Error.')
 					return 'Internal Server Error.', 500
 				# print(key + ':' + res)
-				result = result + res + '\n'
+				result.append(res)
 		return result, 200
+
+
+class QueryCombinedInfo(QueryFee):
+
+	record_uri = 'http://222.192.89.21/sims3/buyRecord.aspx'
+
+	def _PurchaseHistoryRequest(self, sess, query_data, target_data):
+		now = datetime.datetime.now()
+		past = now + datetime.timedelta(days=-60)
+		formated_now = now.strftime('%Y-%m-%d')
+		formated_past = past.strftime('%Y-%m-%d')
+		new_data = dict(query_data)
+		new_data['txtstart'] = formated_past
+		new_data['txtend'] = formated_now
+		new_data['btnser'] = '查询'
+		response = sess.post(self.record_uri, data=new_data, proxies=self.proxy, timeout=2)
+		return self._ProcessResult(response.text, target_data)
+
+	def _ProcessResult(self, res, data):
+		balance = Utils.getDescriptiveText(res)
+		purchase_history = Utils.getPurchaseHistory(res)
+		return {'balance': balance, 'history': purchase_history}
+
+	def _RoomRequest(self, sess, query_data, target_data):
+		new_data = dict(query_data)
+		new_data['drfangjian'] = target_data['drfangjian']
+		extra = {'radio': 'buyR', 'ImageButton1.x': '45', 'ImageButton1.y': '4'}
+		new_data = {**new_data, **extra}
+		response = sess.post(self.uri, data=new_data, proxies=self.proxy, timeout=2)
+		ex_data = dict()
+		ex_data['__VIEWSTATE'] = Utils.getViewstate(response.text)
+		ex_data['__EVENTVALIDATION'] = Utils.getEventValidation(response.text)
+		# Here should be some differences
+		return self._PurchaseHistoryRequest(sess, ex_data, target_data)
+
+
 
 app = Flask(__name__)
 @app.route('/query', methods=['POST'])
@@ -175,18 +228,25 @@ def request_handler():
 		campus = int(request.form['campus'])
 		building = int(request.form['building'])
 		public_dorm = int(request.form['public_dorm'])
-		if 'private_dorm' in request.form:
+		if 'private_dorm' in request.form and request.form['private_dorm']: # private_dorm does exist and not empty
 			private_dorm = int(request.form['private_dorm'])
 		else:
 			private_dorm = None
 	except Exception as e:
 		return 'Invalid Arguments', 401
-	q = QueryFee(sys.argv[1])
-	return q.ExecuteQuery(campus, building, public_dorm, private_dorm)
+	global query_combined
+	res = query_combined.ExecuteQuery(campus, building, public_dorm, private_dorm)
+	if res[1] != 200:
+		return json.dumps({'success': False, 'message': res[0]}), res[1]
+	else:
+		return json.dumps({'success': True, 'data': res[0]}), res[1]
 
 if __name__ == "__main__":
+	if len(sys.argv) < 2:
+		print('[!] No data file specified!')
+		sys.exit(1)
+	query_combined = QueryCombinedInfo(sys.argv[1])
 	app.run(port=5000)
-	
 	'''
 	q = QueryFee(sys.argv[1])
 	arg_copy = sys.argv.copy()
