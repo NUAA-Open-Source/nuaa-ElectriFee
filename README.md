@@ -13,6 +13,12 @@
 ## Usage
 Before you can query Electricity Fee via query.py, you have to generate data by running ```python3 BF.py```
 
+You need to install some requirements
+
+```
+pip install -r requirements.txt
+```
+
 This script will retrieve all the info from the Electricity Query Website and build a tree structure which a dorm is pointed to a dict of arguments required to be submitted.
 
 By executing so, you shall have a pkl file in the current working directory.
