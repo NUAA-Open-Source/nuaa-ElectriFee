@@ -4,19 +4,11 @@
 
 此项目旨在为南京航空航天大学住宿生提供更方便的电费查询方式。
 
-目前已经开发完成怡园21-22, 35-37栋空调电费查询。
-
-目前部署的微信公众号：裂帛碎玉的想法
-
-![](https://source.vvzero.com/wechat-qcode.jpg)
-
-
-
 ## 说明
 
 `src/*`是获取电费的python脚本。
 
-`inspect/inspect.txt`是本人暂时整理的对应关系。
+`inspect/inspect.txt`是部分对应关系。
 
 ## Usage
 Before you can query Electricity Fee via query.py, you have to generate data by running ```python3 BF.py```
