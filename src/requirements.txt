@@ -1,4 +1,4 @@
-flask
-requests
-beautifulsoup4
-pyyaml
+flask==1.0.2
+requests==2.20.1
+beautifulsoup4==4.6.3
+pyyaml==3.13
