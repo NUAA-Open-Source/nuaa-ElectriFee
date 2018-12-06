@@ -12,7 +12,7 @@ import yaml
 import datetime
 from flask import Flask, request
 import logging
-
+import requests.packages.urllib3.connectionpool as httplib
 
 class Utils(object):
 	@staticmethod
@@ -149,6 +149,7 @@ class QueryFee(object):
 		except:
 			return 'Dorm not found', 404
 			sys.exit(1)
+		
 		for key, item in query_item.items():
 			if isinstance(key, int) or key.isdigit(): # Priv Dorm
 				continue
@@ -161,7 +162,7 @@ class QueryFee(object):
 				print('[!] Timeout occurs. Remote server may not be responding.')
 				return 'Timeout occurs. Remote server may not be responding.', 500
 			except requests.exceptions.RequestException as e:
-				print('[!] Internal Server Error.')
+				print('[!] Internal Server Error.' + repr(e))
 				return 'Internal Server Error.', 500
 			# print(key + ':' + res)
 			# result = result + res + '\n'
@@ -179,7 +180,7 @@ class QueryFee(object):
 					print('[!] Timeout occurs. Remote server may not be responding.')
 					return 'Timeout occurs. Remote server may not be responding.', 500
 				except requests.exceptions.RequestException as e:
-					print('[!] Internal Server Error.')
+					print('[!] Internal Server Error.' + repr(e))
 					return 'Internal Server Error.', 500
 				# print(key + ':' + res)
 				result.append(res)
@@ -190,7 +191,7 @@ class QueryCombinedInfo(QueryFee):
 
 	record_uri = 'http://222.192.89.21/sims3/buyRecord.aspx'
 
-	def _PurchaseHistoryRequest(self, sess, query_data, target_data):
+	def _PurchaseHistoryRequest(self, sess, query_data, target_data, redirected_uri):
 		now = datetime.datetime.now()
 		past = now + datetime.timedelta(days=-60)
 		formated_now = now.strftime('%Y-%m-%d')
@@ -199,7 +200,7 @@ class QueryCombinedInfo(QueryFee):
 		new_data['txtstart'] = formated_past
 		new_data['txtend'] = formated_now
 		new_data['btnser'] = '查询'
-		response = sess.post(self.record_uri, data=new_data, proxies=self.proxy, timeout=2)
+		response = sess.post(redirected_uri, data=new_data, proxies=self.proxy, timeout=2)
 		return self._ProcessResult(response.text, target_data)
 
 	def _ProcessResult(self, res, data):
@@ -217,7 +218,7 @@ class QueryCombinedInfo(QueryFee):
 		ex_data['__VIEWSTATE'] = Utils.getViewstate(response.text)
 		ex_data['__EVENTVALIDATION'] = Utils.getEventValidation(response.text)
 		# Here should be some differences
-		return self._PurchaseHistoryRequest(sess, ex_data, target_data)
+		return self._PurchaseHistoryRequest(sess, ex_data, target_data, response.url)
 
 
 
@@ -246,6 +247,14 @@ if __name__ == "__main__":
 		print('[!] No data file specified!')
 		sys.exit(1)
 	query_combined = QueryCombinedInfo(sys.argv[1])
+	'''
+	httplib.HTTPConnection.debuglevel = 1
+	logging.basicConfig()
+	logging.getLogger().setLevel(logging.DEBUG)
+	requests_log = logging.getLogger("requests.packages.urllib3")
+	requests_log.setLevel(logging.DEBUG)
+	requests_log.propagate = True
+	'''
 	app.run(port=5000)
 	'''
 	q = QueryFee(sys.argv[1])
