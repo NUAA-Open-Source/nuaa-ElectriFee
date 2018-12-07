@@ -23,11 +23,11 @@ This script will retrieve all the info from the Electricity Query Website and bu
 
 By executing so, you shall have a pkl file in the current working directory.
 
-Simply run ```python3 query.py <pkl filename>``` and make a HTTP request to http://localhost:5000
+Simply run ```python3 query.py <pkl filename>``` and make a HTTP request to http://localhost:5000/query
 
 Here is a sample curl request:
 ```
-curl -d "campus=1&building=22&public_dorm=702&private_dorm=3" http://localhost:5000 -vvv
+curl -d "campus=1&building=22&public_dorm=702&private_dorm=3" http://localhost:5000/query -vvv
 ```
 
 Then it will return all the information including remaining balance and history of electricity purchase in JSON format.
