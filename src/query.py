@@ -57,13 +57,24 @@ class Utils(object):
 
 	@staticmethod
 	def getPurchaseHistory(text):
-		data = []
+		# Get Label
+		label_data = []
 		bs = BeautifulSoup(text, "html.parser")
+		row = bs.find('tr', attrs={'class':'titleLine'})
+		cols = row.find_all('td')
+		cols = [ele.text.strip() for ele in cols]
+		label_data = [ele for ele in cols if ele]
+		# Get History
+		history_data = []
 		rows = bs.find_all('tr', attrs={'class':'contentLine'})
 		for row in rows:
 			cols = row.find_all('td')
 			cols = [ele.text.strip() for ele in cols]
-			data.append([ele for ele in cols if ele])
+			history_data.append([ele for ele in cols if ele])
+		# Combine Data
+		data = []
+		for history in history_data:
+			data.append(dict(zip(label_data, history)))
 		return data
 
 class QueryFee(object):
